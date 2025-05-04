@@ -1,12 +1,54 @@
-const Guest = require('../models/guestModel');
+const Guest = require('../models/Guest');
 
-exports.create = (guestData) => {
+// Create a new guest
+async function create(guestData) {
   const guest = new Guest(guestData);
-  return guest.save();
-};
+  await guest.save();
+  return guest;
+}
 
-exports.get = (filter) => Guest.findOne(filter);
-exports.list = (pageInfo) => Guest.find().skip(pageInfo.skip).limit(pageInfo.limit);
-exports.update = (id, data) => Guest.findByIdAndUpdate(id, data, { new: true });
-exports.delete = (id) => Guest.findByIdAndDelete(id);
-exports.getByRoomId = (roomId) => Guest.find({ roomId });
+// Get a guest by ID
+async function get(id) {
+  return await Guest.findById(id).populate('roomId');  // Assuming roomId is a reference to the Room model
+}
+
+// Get all guests, optionally with filters like pagination
+async function list({ skip = 0, limit = 100 }) {
+  return await Guest.find().skip(skip).limit(limit).populate('roomId');
+}
+
+// Update a guest's details
+async function update(id, guestData) {
+  const guest = await Guest.findByIdAndUpdate(id, guestData, { new: true });
+  return guest;
+}
+
+// Delete a guest by ID
+async function deleteGuest(id) {
+  return await Guest.findByIdAndDelete(id);
+}
+
+// Get all guests in a specific room (optional)
+async function getGuestsByRoom(roomId) {
+  return await Guest.find({ roomId }).populate('roomId');
+}
+
+// Optionally, you can add additional methods for reporting or analytics
+async function getGuestStayDuration(guestId) {
+  const guest = await Guest.findById(guestId);
+  if (guest && guest.checkInDate && guest.checkOutDate) {
+    const duration = (new Date(guest.checkOutDate) - new Date(guest.checkInDate)) / (1000 * 60 * 60 * 24);
+    return duration;
+  }
+  return null;
+}
+
+module.exports = {
+  create,
+  get,
+  list,
+  update,
+  deleteGuest,
+  getGuestsByRoom,
+  getGuestStayDuration
+};

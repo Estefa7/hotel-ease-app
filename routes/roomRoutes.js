@@ -1,28 +1,25 @@
 const express = require('express');
 const router = express.Router();
-
 const roomController = require('../controllers/roomController');
-const {
-  validateRoomCreation,
-  validateRoomUpdate
-} = require('../validators/validate');
+const { validateRoomCreation, validateRoomUpdate } = require('../middleware/validate');
+const auth = require('../middleware/authMiddleware');
 
 // Create a new room
-router.post('/', validateRoomCreation, roomController.createRoom);
+router.post('/room', auth.protect, validateRoomCreation, roomController.createRoom);
 
-// Get a room by ID
-router.get('/:id', roomController.getRoomById);
+// Get details of a specific room by ID
+router.get('/room/:id', auth.protect, roomController.getRoomById);
 
 // List all rooms
-router.get('/', roomController.listRooms);
+router.get('/room', auth.protect, roomController.listRooms);
 
-// Update a room
-router.put('/:id', validateRoomUpdate, roomController.updateRoom);
+// Update a room’s details
+router.put('/room/:id', auth.protect, validateRoomUpdate, roomController.updateRoom);
 
 // Delete a room
-router.delete('/:id', roomController.deleteRoom);
+router.delete('/room/:id', auth.protect, roomController.deleteRoom);
 
 // Filter rooms by query parameters
-router.get('/filter/params', roomController.filterRooms);
+router.get('/room/filter', auth.protect, roomController.filterRooms);
 
 module.exports = router;

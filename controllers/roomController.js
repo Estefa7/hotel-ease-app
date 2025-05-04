@@ -1,4 +1,4 @@
-const roomDao = require('../daos/roomDao');
+const roomDao = require('../daos/roomDAO');
 
 exports.createRoom = async (req, res) => {
   try {
@@ -11,7 +11,7 @@ exports.createRoom = async (req, res) => {
 
 exports.getRoomById = async (req, res) => {
   try {
-    const room = await roomDao.get({ _id: req.params.id });
+    const room = await roomDao.get(req.params.id);
     if (!room) return res.status(404).json({ message: 'Room not found' });
     res.json(room);
   } catch (err) {
@@ -42,7 +42,7 @@ exports.updateRoom = async (req, res) => {
 
 exports.deleteRoom = async (req, res) => {
   try {
-    await roomDao.delete(req.params.id);
+    await roomDao.deleteRoom(req.params.id);
     res.status(204).end();
   } catch (err) {
     res.status(500).json({ message: err.message });

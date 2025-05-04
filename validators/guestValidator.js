@@ -1,17 +1,21 @@
 const Joi = require('joi');
 
 const createGuestSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().email().required(),
-  phone: Joi.string().required(),
-  roomId: Joi.string().required()
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
+  phoneNumber: Joi.string().required(),
+  checkInDate: Joi.date().required(),
+  checkOutDate: Joi.date().required(),
+  roomId: Joi.string().required(),
 });
 
 const updateGuestSchema = Joi.object({
-  name: Joi.string(),
-  email: Joi.string().email(),
-  phone: Joi.string(),
-  roomId: Joi.string()
+  firstName: Joi.string(),
+  lastName: Joi.string(),
+  phoneNumber: Joi.string(),
+  checkInDate: Joi.date(),
+  checkOutDate: Joi.date(),
+  roomId: Joi.string(),
 });
 
 const validateCreateGuest = (data) => createGuestSchema.validate(data);

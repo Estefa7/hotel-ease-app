@@ -1,5 +1,6 @@
-const guestDao = require('../daos/guestDao');
+const guestDao = require('../daos/guestDAO');
 
+// Create a new guest
 exports.createGuest = async (req, res) => {
   try {
     const guest = await guestDao.create({ ...req.body, createdBy: req.user.id });
@@ -9,9 +10,10 @@ exports.createGuest = async (req, res) => {
   }
 };
 
+// Get a guest by ID
 exports.getGuestById = async (req, res) => {
   try {
-    const guest = await guestDao.get({ _id: req.params.id });
+    const guest = await guestDao.get(req.params.id);       // pass id directly
     if (!guest) return res.status(404).json({ message: 'Guest not found' });
     res.json(guest);
   } catch (err) {
@@ -19,15 +21,19 @@ exports.getGuestById = async (req, res) => {
   }
 };
 
+// List all guests (with optional pagination)
 exports.listGuests = async (req, res) => {
   try {
-    const guests = await guestDao.list({ skip: 0, limit: 100 });
+    const { skip = 0, limit = 100 } = req.query;  // Accept pagination parameters
+    const guests = await guestDao.list({ skip: parseInt(skip), limit: parseInt(limit) });
     res.json(guests);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
+
+// Update a guest's details
 exports.updateGuest = async (req, res) => {
   try {
     const guest = await guestDao.update(req.params.id, req.body);
@@ -38,19 +44,22 @@ exports.updateGuest = async (req, res) => {
   }
 };
 
+// Delete a guest by ID
 exports.deleteGuest = async (req, res) => {
   try {
-    await guestDao.delete(req.params.id);
+    const deleted = await guestDao.deleteGuest(req.params.id);  // call deleteGuest
+    if (!deleted) return res.status(404).json({ message: 'Guest not found' });
     res.status(204).end();
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
+// Get all guests in a specific room
 exports.getGuestsByRoom = async (req, res) => {
   try {
     const guests = await guestDao.getByRoomId(req.params.roomId);
-    if (guests.length === 0) return res.json({ message: 'No guests found for this room' });
+    if (guests.length === 0) return res.status(404).json({ message: 'No guests found for this room' });
     res.json(guests);
   } catch (err) {
     res.status(500).json({ message: err.message });

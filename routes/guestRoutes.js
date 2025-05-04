@@ -1,25 +1,23 @@
+// routes/guestRoutes.js
 const express = require('express');
 const router = express.Router();
-
 const guestController = require('../controllers/guestController');
-const {
-  validateGuestCreation,
-  validateGuestUpdate
-} = require('../validators/validate');
+const { validateGuestCreation, validateGuestUpdate } = require('../middleware/validate');
+const auth = require('../middleware/authMiddleware');
 
 // Create a new guest
-router.post('/', validateGuestCreation, guestController.createGuest);
+router.post('/guests', auth.protect, validateGuestCreation, guestController.createGuest);
 
-// Get a guest by ID
-router.get('/:id', guestController.getGuestById);
+// Get details of a specific guest
+router.get('/guests/:id', auth.protect, guestController.getGuestById);
 
 // List all guests
-router.get('/', guestController.listGuests);
+router.get('/guests', auth.protect, guestController.listGuests);
 
-// Update a guest
-router.put('/:id', validateGuestUpdate, guestController.updateGuest);
+// Update a guest’s details
+router.put('/guests/:id', auth.protect, validateGuestUpdate, guestController.updateGuest);
 
 // Delete a guest
-router.delete('/:id', guestController.deleteGuest);
+router.delete('/guests/:id', auth.protect, guestController.deleteGuest);
 
 module.exports = router;

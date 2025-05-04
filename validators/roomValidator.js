@@ -1,20 +1,27 @@
+// validators/roomValidator.js
 const Joi = require('joi');
 
 const createRoomSchema = Joi.object({
-  number: Joi.string().required(),
-  type: Joi.string().valid('single', 'double', 'suite').required(),
-  price: Joi.number().min(0).required(),
-  status: Joi.string().valid('available', 'occupied').default('available')
+  roomNumber:    Joi.string().required(),
+  roomType:      Joi.string().valid('single','double','suite').required(),
+  pricePerNight: Joi.number().min(0).required(),
+  capacity:      Joi.number().min(1).required(),
+  hasBalcony:    Joi.boolean().optional(),
+  availability:  Joi.boolean().optional(),
+  status:        Joi.string().valid('vacant','occupied','maintenance').optional()
 });
 
 const updateRoomSchema = Joi.object({
-  number: Joi.string(),
-  type: Joi.string().valid('single', 'double', 'suite'),
-  price: Joi.number().min(0),
-  status: Joi.string().valid('available', 'occupied')
+  roomNumber:    Joi.string(),
+  roomType:      Joi.string().valid('single','double','suite'),
+  pricePerNight: Joi.number().min(0),
+  capacity:      Joi.number().min(1),
+  hasBalcony:    Joi.boolean(),
+  availability:  Joi.boolean(),
+  status:        Joi.string().valid('vacant','occupied','maintenance')
 });
 
-const validateCreateRoom = (data) => createRoomSchema.validate(data);
-const validateUpdateRoom = (data) => updateRoomSchema.validate(data);
-
-module.exports = { validateCreateRoom, validateUpdateRoom };
+module.exports = {
+  validateCreateRoom: data => createRoomSchema.validate(data),
+  validateUpdateRoom: data => updateRoomSchema.validate(data)
+};

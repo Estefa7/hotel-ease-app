@@ -1,15 +1,42 @@
-const Admin = require('../models/adminModel');
+const Admin = require('../models/adminModel');  // Import your Admin model
 
-exports.create = async (adminData) => {
+// Get an admin by their username
+async function getByUsername(username) {
+  return await Admin.findOne({ username });
+}
+
+// Create a new admin
+async function create(adminData) {
   const admin = new Admin(adminData);
-  return await admin.save();
-};
+  await admin.save();
+  return admin;
+}
 
-exports.getByEmail = async (email) => {
-  return await Admin.findOne({ email });
-};
-
-// Other DAO methods (get, update, delete, list)...
-exports.getById = async (id) => {
+// Get an admin by ID
+async function get(id) {
   return await Admin.findById(id);
+}
+
+// List all admins (with optional pagination)
+async function list({ skip = 0, limit = 100 }) {
+  return await Admin.find().skip(skip).limit(limit);
+}
+
+// Update an admin's details
+async function update(id, adminData) {
+  return await Admin.findByIdAndUpdate(id, adminData, { new: true });
+}
+
+// Delete an admin by ID
+async function deleteAdmin(id) {
+  return await Admin.findByIdAndDelete(id);
+}
+
+module.exports = {
+  getByUsername,
+  create,
+  get,
+  list,
+  update,
+  deleteAdmin
 };
