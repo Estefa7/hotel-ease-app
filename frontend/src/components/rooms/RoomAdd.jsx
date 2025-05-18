@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../../api/axiosInstance'; // ✅ Use the configured Axios instance
 
 function RoomAdd({ onAdd }) {
   const [room, setRoom] = useState({
@@ -10,27 +10,27 @@ function RoomAdd({ onAdd }) {
     hasBalcony: false,
     availability: true,
     status: 'vacant',
-    createdBy: '6631d43a8db9a37a5670b9a1' // 📝 replace with real admin ID if using auth
   });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
-    setRoom(prev => ({
+    setRoom((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/rooms', {
+      const response = await api.post('/rooms', {
         ...room,
         pricePerNight: Number(room.pricePerNight),
-        capacity: Number(room.capacity)
+        capacity: Number(room.capacity),
       });
+
       onAdd(response.data);
+
       // Reset form
       setRoom({
         roomNumber: '',
@@ -40,10 +40,9 @@ function RoomAdd({ onAdd }) {
         hasBalcony: false,
         availability: true,
         status: 'vacant',
-        createdBy: '6631d43a8db9a37a5670b9a1'
       });
     } catch (err) {
-      console.error('Error creating room:', err);
+      console.error('Error creating room:', err.response?.data || err.message);
     }
   };
 
@@ -59,16 +58,24 @@ function RoomAdd({ onAdd }) {
           required
         />
       </div>
+
+      {/* ✅ Room Type Dropdown */}
       <div className="mb-3">
         <label>Room Type</label>
-        <input
+        <select
           name="roomType"
-          className="form-control"
+          className="form-select"
           value={room.roomType}
           onChange={handleChange}
           required
-        />
+        >
+          <option value="">-- Select Room Type --</option>
+          <option value="single">Single</option>
+          <option value="double">Double</option>
+          <option value="suite">Suite</option>
+        </select>
       </div>
+
       <div className="mb-3">
         <label>Price per Night</label>
         <input
@@ -80,6 +87,7 @@ function RoomAdd({ onAdd }) {
           required
         />
       </div>
+
       <div className="mb-3">
         <label>Capacity</label>
         <input
@@ -91,17 +99,18 @@ function RoomAdd({ onAdd }) {
           required
         />
       </div>
-      <div className="mb-3">
-        <label>
-          <input
-            name="hasBalcony"
-            type="checkbox"
-            checked={room.hasBalcony}
-            onChange={handleChange}
-          />
-          {' '}Has Balcony
-        </label>
+
+      <div className="mb-3 form-check">
+        <input
+          name="hasBalcony"
+          type="checkbox"
+          className="form-check-input"
+          checked={room.hasBalcony}
+          onChange={handleChange}
+        />
+        <label className="form-check-label">Has Balcony</label>
       </div>
+
       <div className="mb-3">
         <label>Status</label>
         <select
@@ -115,17 +124,18 @@ function RoomAdd({ onAdd }) {
           <option value="maintenance">Maintenance</option>
         </select>
       </div>
-      <div className="mb-3">
-        <label>
-          <input
-            name="availability"
-            type="checkbox"
-            checked={room.availability}
-            onChange={handleChange}
-          />
-          {' '}Available
-        </label>
+
+      <div className="mb-3 form-check">
+        <input
+          name="availability"
+          type="checkbox"
+          className="form-check-input"
+          checked={room.availability}
+          onChange={handleChange}
+        />
+        <label className="form-check-label">Available</label>
       </div>
+
       <button type="submit" className="btn btn-primary">Add Room</button>
     </form>
   );

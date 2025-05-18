@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import Layout from '../components/layout/Layout';
 import RoomList from '../components/rooms/RoomList';
-import api from '../api/axiosInstance';
 import RoomAdd from '../components/rooms/RoomAdd';
 import RoomEdit from '../components/rooms/RoomEdit';
+import api from '../api/axiosInstance';
 
 function RoomsPage() {
   const [rooms, setRooms] = useState([]);
@@ -12,17 +12,39 @@ function RoomsPage() {
   const [isAddPopupVisible, setAddVisible] = useState(false);
   const [isEditPopupVisible, setEditVisible] = useState(false);
 
-  const addRoom = (room) => {
-    setRooms([...rooms, { ...room, id: Date.now() }]);
+  // ✅ Fetch rooms when the component mounts
+  useEffect(() => {
+    fetchRooms();
+  }, []);
+
+  const fetchRooms = async () => {
+    try {
+      const res = await api.get('/rooms');
+      setRooms(res.data);
+    } catch (err) {
+      console.error('Error fetching rooms:', err);
+    }
+  };
+
+  // ✅ After adding, reload from backend
+  const addRoom = () => {
+    fetchRooms();
     setAddVisible(false);
   };
 
-  const editRoom = (room) => {
-    setRooms(rooms.map((r) => (r.id === room.id ? room : r)));
+  const editRoom = () => {
+    fetchRooms();
     setEditVisible(false);
   };
 
-  const deleteRoom = (id) => setRooms(rooms.filter((r) => r.id !== id));
+  const deleteRoom = async (id) => {
+    try {
+      await api.delete(`/rooms/${id}`);
+      fetchRooms();
+    } catch (err) {
+      console.error('Error deleting room:', err);
+    }
+  };
 
   return (
     <Layout>
