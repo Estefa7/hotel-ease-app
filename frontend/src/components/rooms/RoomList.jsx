@@ -6,7 +6,7 @@ function RoomList({ rooms, onEdit, onDelete }) {
   return (
     <>
       {rooms.map((room) => (
-        <RoomCard key={room.id} room={room} onEdit={onEdit} onDelete={onDelete} />
+        <RoomCard key={room._id} room={room} onEdit={onEdit} onDelete={onDelete} />
       ))}
     </>
   );
