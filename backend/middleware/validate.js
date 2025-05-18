@@ -3,16 +3,16 @@
 const {
   validateCreateRoom,
   validateUpdateRoom
-} = require('../../validators/roomValidator');
+} = require('../validators/roomValidator');
 const {
   validateCreateGuest,
   validateUpdateGuest
-} = require('../../validators/guestValidator');
+} = require('../validators/guestValidator');
 const {
   validateLogin,
   validateCreateAdmin,
   validateUpdateAdmin
-} = require('../../validators/adminValidator');
+} = require('../validators/adminValidator');
 
 // Room validation
 const validateRoomCreation = (req, res, next) => {

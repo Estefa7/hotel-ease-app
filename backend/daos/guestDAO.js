@@ -1,4 +1,4 @@
-const Guest = require('../models/Guest');
+const Guest = require('../models/GuestModel');
 
 // Create a new guest
 async function create(guestData) {

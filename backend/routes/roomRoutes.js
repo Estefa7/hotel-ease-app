@@ -1,25 +1,30 @@
 const express = require('express');
 const router = express.Router();
+
 const roomController = require('../controllers/roomController');
 const { validateRoomCreation, validateRoomUpdate } = require('../middleware/validate');
 const auth = require('../middleware/authMiddleware');
+// ✅ DEBUG: check what these really are
+console.log('auth.protect is', typeof auth.protect);
+console.log('validateRoomCreation is', typeof validateRoomCreation);
+console.log('roomController.createRoom is', typeof roomController.createRoom);
 
 // Create a new room
-router.post('/room', auth.protect, validateRoomCreation, roomController.createRoom);
-
-// Get details of a specific room by ID
-router.get('/room/:id', auth.protect, roomController.getRoomById);
+router.post('/', auth.protect, validateRoomCreation, roomController.createRoom);
 
 // List all rooms
-router.get('/room', auth.protect, roomController.listRooms);
+router.get('/', auth.protect, roomController.listRooms);
+
+// Get details of a specific room by ID
+router.get('/:id', auth.protect, roomController.getRoomById);
 
 // Update a room’s details
-router.put('/room/:id', auth.protect, validateRoomUpdate, roomController.updateRoom);
+router.put('/:id', auth.protect, validateRoomUpdate, roomController.updateRoom);
 
 // Delete a room
-router.delete('/room/:id', auth.protect, roomController.deleteRoom);
+router.delete('/:id', auth.protect, roomController.deleteRoom);
 
-// Filter rooms by query parameters
-router.get('/room/filter', auth.protect, roomController.filterRooms);
+// Filter rooms by query parameters (should be placed before `/:id`)
+router.get('/filter/advanced', auth.protect, roomController.filterRooms);
 
 module.exports = router;

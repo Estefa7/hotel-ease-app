@@ -1,16 +1,8 @@
-const adminDao = require('../../daos/adminDAO');
-
+const adminDao = require('../daos/adminDAO');
 
 exports.login = async (req, res) => {
   console.log("=== LOGIN CONTROLLER REACHED ===");
-  ...
 
-
-
-
-  
-// 1) Admin login
-exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
     const admin = await adminDao.getByUsername(username);
@@ -23,10 +15,11 @@ exports.login = async (req, res) => {
       admin: { id: admin._id, username: admin.username, role: admin.role }
     });
   } catch (err) {
-    console.error("Login error:", err); // Add this
+    console.error("Login error:", err);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // 2) Create a new admin
 exports.createAdmin = async (req, res) => {
