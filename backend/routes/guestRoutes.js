@@ -6,18 +6,18 @@ const { validateGuestCreation, validateGuestUpdate } = require('../middleware/va
 const auth = require('../middleware/authMiddleware');
 
 // Create a new guest
-router.post('/guests', auth.protect, validateGuestCreation, guestController.createGuest);
+router.post('/', auth.protect, validateGuestCreation, guestController.createGuest);
 
 // Get details of a specific guest
-router.get('/guests/:id', auth.protect, guestController.getGuestById);
+router.get('/:id', auth.protect, guestController.getGuestById);
 
 // List all guests
-router.get('/guests', auth.protect, guestController.listGuests);
+router.get('/', auth.protect, guestController.listGuests);
 
 // Update a guest’s details
-router.put('/guests/:id', auth.protect, validateGuestUpdate, guestController.updateGuest);
+router.put('/:id', auth.protect, validateGuestUpdate, guestController.updateGuest);
 
 // Delete a guest
-router.delete('/guests/:id', auth.protect, guestController.deleteGuest);
+router.delete('/:id', auth.protect, guestController.deleteGuest);
 
 module.exports = router;

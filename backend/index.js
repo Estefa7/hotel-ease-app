@@ -24,6 +24,9 @@ app.use('/api/admins', adminRoutes); // POST /api/admins/auth/login
 const roomRoutes = require('./routes/roomRoutes');
 app.use('/api/rooms', roomRoutes);   // Example: protected room routes
 
+const guestRoutes = require('./routes/guestRoutes');
+app.use('/api/guests', guestRoutes);
+
 // Root test route
 app.get('/', (req, res) => {
   res.send('HotelEase backend is running!');
