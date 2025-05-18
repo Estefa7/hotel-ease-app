@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 import Layout from '../components/layout/Layout';
 import RoomList from '../components/rooms/RoomList';
 import RoomAdd from '../components/rooms/RoomAdd';
@@ -12,21 +12,31 @@ function RoomsPage() {
   const [isAddPopupVisible, setAddVisible] = useState(false);
   const [isEditPopupVisible, setEditVisible] = useState(false);
 
-  // ✅ Fetch rooms when the component mounts
+  const [filters, setFilters] = useState({
+    roomType: '',
+    status: '',
+    hasBalcony: '',
+    sortBy: '',
+  });
+
   useEffect(() => {
     fetchRooms();
-  }, []);
+  }, [filters]);
 
   const fetchRooms = async () => {
     try {
-      const res = await api.get('/rooms');
+      const res = await api.get('/rooms', { params: filters });
       setRooms(res.data);
     } catch (err) {
       console.error('Error fetching rooms:', err);
     }
   };
 
-  // ✅ After adding, reload from backend
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
   const addRoom = () => {
     fetchRooms();
     setAddVisible(false);
@@ -53,7 +63,46 @@ function RoomsPage() {
         <Button variant="success" onClick={() => setAddVisible(true)}>Add Room</Button>
       </div>
 
-      {/* Room List */}
+      {/* Filters and Sorting */}
+      <Form className="mb-4">
+        <Row>
+          <Col md={3}>
+            <Form.Label>Room Type</Form.Label>
+            <Form.Select name="roomType" value={filters.roomType} onChange={handleFilterChange}>
+              <option value="">All</option>
+              <option value="single">Single</option>
+              <option value="double">Double</option>
+              <option value="suite">Suite</option>
+            </Form.Select>
+          </Col>
+          <Col md={3}>
+            <Form.Label>Status</Form.Label>
+            <Form.Select name="status" value={filters.status} onChange={handleFilterChange}>
+              <option value="">All</option>
+              <option value="vacant">Vacant</option>
+              <option value="occupied">Occupied</option>
+              <option value="maintenance">Maintenance</option>
+            </Form.Select>
+          </Col>
+          <Col md={3}>
+            <Form.Label>Has Balcony</Form.Label>
+            <Form.Select name="hasBalcony" value={filters.hasBalcony} onChange={handleFilterChange}>
+              <option value="">All</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </Form.Select>
+          </Col>
+          <Col md={3}>
+            <Form.Label>Sort by Price</Form.Label>
+            <Form.Select name="sortBy" value={filters.sortBy} onChange={handleFilterChange}>
+              <option value="">Default</option>
+              <option value="priceAsc">Price: Low to High</option>
+              <option value="priceDesc">Price: High to Low</option>
+            </Form.Select>
+          </Col>
+        </Row>
+      </Form>
+
       <RoomList
         rooms={rooms}
         onEdit={(room) => {

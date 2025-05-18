@@ -21,12 +21,20 @@ exports.getRoomById = async (req, res) => {
 
 exports.listRooms = async (req, res) => {
   try {
-    const rooms = await roomDao.list({ skip: 0, limit: 100 });
+    const filters = {
+      roomType: req.query.roomType,
+      status: req.query.status,
+      hasBalcony: req.query.hasBalcony,
+      sortBy: req.query.sortBy,
+    };
+
+    const rooms = await roomDao.list(filters);
     res.json(rooms);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.updateRoom = async (req, res) => {
   try {

@@ -1,5 +1,4 @@
 const Room = require('../models/roomModel');
-
 // Create a new room
 async function create(roomData) {
   const room = new Room(roomData);
@@ -12,10 +11,34 @@ async function get(id) {
   return await Room.findById(id);
 }
 
-// Get all rooms, optionally with filters like pagination
-async function list({ skip = 0, limit = 100 }) {
-  return await Room.find().skip(skip).limit(limit);
+async function list(filters = {}) {
+  const query = {};
+
+  // Filtering
+  if (filters.roomType) {
+    query.roomType = filters.roomType;
+  }
+
+  if (filters.status) {
+    query.status = filters.status;
+  }
+
+  if (filters.hasBalcony === 'true' || filters.hasBalcony === 'false') {
+    query.hasBalcony = filters.hasBalcony === 'true';
+  }
+
+  let sort = {};
+
+  // Sorting
+  if (filters.sortBy === 'priceAsc') {
+    sort.pricePerNight = 1;
+  } else if (filters.sortBy === 'priceDesc') {
+    sort.pricePerNight = -1;
+  }
+
+  return await Room.find(query).sort(sort);
 }
+// List all rooms with optional filters
 
 // Update a room's details
 async function update(id, roomData) {
