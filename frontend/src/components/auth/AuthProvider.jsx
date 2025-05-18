@@ -1,4 +1,6 @@
-import { createContext, useContext, useState } from 'react';
+// src/components/auth/AuthProvider.jsx
+
+import React, { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext();
 
