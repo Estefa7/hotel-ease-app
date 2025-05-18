@@ -14,22 +14,39 @@ async function get(id) {
 async function list(filters = {}) {
   const query = {};
 
-  // Filtering
+  // 🟩 Room Type
   if (filters.roomType) {
     query.roomType = filters.roomType;
   }
 
+  // 🟩 Status
   if (filters.status) {
     query.status = filters.status;
   }
 
+  // 🟩 Has Balcony
   if (filters.hasBalcony === 'true' || filters.hasBalcony === 'false') {
     query.hasBalcony = filters.hasBalcony === 'true';
   }
 
-  let sort = {};
+  // 🟩 Search by Room Number
+  if (filters.search) {
+    query.roomNumber = { $regex: filters.search, $options: 'i' };
+  }
 
-  // Sorting
+  // 🟩 Price Range
+  if (filters.minPrice || filters.maxPrice) {
+    query.pricePerNight = {};
+    if (filters.minPrice) {
+      query.pricePerNight.$gte = parseFloat(filters.minPrice);
+    }
+    if (filters.maxPrice) {
+      query.pricePerNight.$lte = parseFloat(filters.maxPrice);
+    }
+  }
+
+  // 🔃 Sorting
+  let sort = {};
   if (filters.sortBy === 'priceAsc') {
     sort.pricePerNight = 1;
   } else if (filters.sortBy === 'priceDesc') {
@@ -38,6 +55,7 @@ async function list(filters = {}) {
 
   return await Room.find(query).sort(sort);
 }
+
 // List all rooms with optional filters
 
 // Update a room's details

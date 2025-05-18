@@ -13,11 +13,15 @@ function RoomsPage() {
   const [isEditPopupVisible, setEditVisible] = useState(false);
 
   const [filters, setFilters] = useState({
-    roomType: '',
-    status: '',
-    hasBalcony: '',
-    sortBy: '',
-  });
+  roomType: '',
+  status: '',
+  hasBalcony: '',
+  sortBy: '',
+  search: '',
+  minPrice: '',
+  maxPrice: '',
+});
+
 
   useEffect(() => {
     fetchRooms();
@@ -62,6 +66,43 @@ function RoomsPage() {
         <h2>Rooms</h2>
         <Button variant="success" onClick={() => setAddVisible(true)}>Add Room</Button>
       </div>
+
+<Form className="mb-3">
+  <Row>
+    <Col md={4}>
+      <Form.Label>Search by Room Number</Form.Label>
+      <Form.Control
+        type="text"
+        name="search"
+        value={filters.search}
+        onChange={handleFilterChange}
+        placeholder="Enter room number"
+      />
+    </Col>
+
+    <Col md={4}>
+      <Form.Label>Min Price</Form.Label>
+      <Form.Control
+        type="number"
+        name="minPrice"
+        value={filters.minPrice}
+        onChange={handleFilterChange}
+        placeholder="0"
+      />
+    </Col>
+
+    <Col md={4}>
+      <Form.Label>Max Price</Form.Label>
+      <Form.Control
+        type="number"
+        name="maxPrice"
+        value={filters.maxPrice}
+        onChange={handleFilterChange}
+        placeholder="1000"
+      />
+    </Col>
+  </Row>
+</Form>
 
       {/* Filters and Sorting */}
       <Form className="mb-4">

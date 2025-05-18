@@ -25,6 +25,9 @@ exports.listRooms = async (req, res) => {
       roomType: req.query.roomType,
       status: req.query.status,
       hasBalcony: req.query.hasBalcony,
+      search: req.query.search,
+      minPrice: req.query.minPrice,
+      maxPrice: req.query.maxPrice,
       sortBy: req.query.sortBy,
     };
 
@@ -34,6 +37,7 @@ exports.listRooms = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 
 exports.updateRoom = async (req, res) => {
