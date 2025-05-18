@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import api from '../../api/axiosInstance';
 
 function GuestEdit({ guest, onEdit }) {
-  const [updatedGuest, setUpdatedGuest] = useState(guest);
+  const [updatedGuest, setUpdatedGuest] = useState(null);
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
-    setUpdatedGuest(guest); // Reset form on guest change
+    if (guest) setUpdatedGuest(guest);
   }, [guest]);
 
   useEffect(() => {
@@ -18,9 +18,14 @@ function GuestEdit({ guest, onEdit }) {
     setUpdatedGuest(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onEdit(updatedGuest);
+    try {
+      const res = await api.put(`/guests/${updatedGuest._id}`, updatedGuest);
+      onEdit(res.data);
+    } catch (err) {
+      console.error('Error updating guest:', err);
+    }
   };
 
   if (!updatedGuest) return null;
@@ -28,23 +33,73 @@ function GuestEdit({ guest, onEdit }) {
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-3">
-        <label>Name</label>
-        <input name="name" className="form-control" value={updatedGuest.name} onChange={handleChange} required />
+        <label>First Name</label>
+        <input
+          name="firstName"
+          className="form-control"
+          value={updatedGuest.firstName || ''}
+          onChange={handleChange}
+          required
+        />
       </div>
       <div className="mb-3">
-        <label>Email</label>
-        <input name="email" className="form-control" value={updatedGuest.email} onChange={handleChange} required />
+        <label>Last Name</label>
+        <input
+          name="lastName"
+          className="form-control"
+          value={updatedGuest.lastName || ''}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <div className="mb-3">
+        <label>Phone Number</label>
+        <input
+          name="phoneNumber"
+          className="form-control"
+          value={updatedGuest.phoneNumber || ''}
+          onChange={handleChange}
+          required
+        />
       </div>
       <div className="mb-3">
         <label>Assign Room</label>
-        <select name="roomId" className="form-select" value={updatedGuest.roomId} onChange={handleChange} required>
+        <select
+          name="roomId"
+          className="form-select"
+          value={updatedGuest.roomId || ''}
+          onChange={handleChange}
+          required
+        >
           <option value="">-- Select Room --</option>
           {rooms.map(room => (
             <option key={room._id} value={room._id}>{room.name}</option>
           ))}
         </select>
       </div>
-      <button className="btn btn-primary" type="submit">Save</button>
+      <div className="mb-3">
+        <label>Check-In Date</label>
+        <input
+          name="checkInDate"
+          type="date"
+          className="form-control"
+          value={updatedGuest.checkInDate?.slice(0, 10) || ''}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <div className="mb-3">
+        <label>Check-Out Date</label>
+        <input
+          name="checkOutDate"
+          type="date"
+          className="form-control"
+          value={updatedGuest.checkOutDate?.slice(0, 10) || ''}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <button type="submit" className="btn btn-primary">Save</button>
     </form>
   );
 }
