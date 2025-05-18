@@ -1,4 +1,4 @@
-const adminDao = require('../daos/adminDAO');
+const adminDao = require('../../daos/adminDAO');
 
 
 exports.login = async (req, res) => {

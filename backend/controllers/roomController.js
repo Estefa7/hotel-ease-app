@@ -1,4 +1,4 @@
-const roomDao = require('../daos/roomDAO');
+const roomDao = require('../../daos/roomDAO');
 
 exports.createRoom = async (req, res) => {
   try {
