@@ -12,7 +12,8 @@ exports.login = async (req, res) => {
     const token = admin.generateToken();
     res.json({
       token,
-      admin: { id: admin._id, username: admin.username, role: admin.role }
+      admin: { _id: admin._id, username: admin.username, role: admin.role }
+
     });
   } catch (err) {
     console.error("Login error:", err);

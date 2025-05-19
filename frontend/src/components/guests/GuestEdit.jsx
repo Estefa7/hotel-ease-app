@@ -4,31 +4,57 @@ import api from '../../api/axiosInstance';
 function GuestEdit({ guest, onEdit }) {
   const [updatedGuest, setUpdatedGuest] = useState(null);
   const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Sync incoming guest prop
   useEffect(() => {
     if (guest) setUpdatedGuest(guest);
   }, [guest]);
 
+  // Load rooms once
   useEffect(() => {
-    api.get('/rooms').then(res => setRooms(res.data)).catch(console.error);
+    api.get('/rooms')
+      .then(res => {
+        setRooms(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to load rooms', err);
+        setLoading(false);
+      });
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUpdatedGuest(prev => ({ ...prev, [name]: value }));
+    setUpdatedGuest(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!updatedGuest) return;
+
+    // Normalize roomId
+    const payload = {
+      ...updatedGuest,
+      roomId:
+        typeof updatedGuest.roomId === 'object'
+          ? updatedGuest.roomId._id
+          : updatedGuest.roomId
+    };
+
     try {
-      const res = await api.put(`/guests/${updatedGuest._id}`, updatedGuest);
+      const res = await api.put(`/guests/${updatedGuest._id}`, payload);
       onEdit(res.data);
     } catch (err) {
       console.error('Error updating guest:', err);
     }
   };
 
-  if (!updatedGuest) return null;
+  if (!updatedGuest || loading) return <p>Loading...</p>;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -67,13 +93,19 @@ function GuestEdit({ guest, onEdit }) {
         <select
           name="roomId"
           className="form-select"
-          value={updatedGuest.roomId || ''}
+          value={
+            typeof updatedGuest.roomId === 'object'
+              ? updatedGuest.roomId._id
+              : updatedGuest.roomId || ''
+          }
           onChange={handleChange}
           required
         >
           <option value="">-- Select Room --</option>
           {rooms.map(room => (
-            <option key={room._id} value={room._id}>{room.name}</option>
+            <option key={room._id} value={room._id}>
+              {room.roomNumber || room.roomType || `Room ${room._id}`}
+            </option>
           ))}
         </select>
       </div>
@@ -83,7 +115,11 @@ function GuestEdit({ guest, onEdit }) {
           name="checkInDate"
           type="date"
           className="form-control"
-          value={updatedGuest.checkInDate?.slice(0, 10) || ''}
+          value={
+            updatedGuest.checkInDate
+              ? updatedGuest.checkInDate.slice(0, 10)
+              : ''
+          }
           onChange={handleChange}
           required
         />
@@ -94,12 +130,18 @@ function GuestEdit({ guest, onEdit }) {
           name="checkOutDate"
           type="date"
           className="form-control"
-          value={updatedGuest.checkOutDate?.slice(0, 10) || ''}
+          value={
+            updatedGuest.checkOutDate
+              ? updatedGuest.checkOutDate.slice(0, 10)
+              : ''
+          }
           onChange={handleChange}
           required
         />
       </div>
-      <button type="submit" className="btn btn-primary">Save</button>
+      <button type="submit" className="btn btn-primary">
+        Save
+      </button>
     </form>
   );
 }

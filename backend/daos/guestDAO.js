@@ -13,9 +13,13 @@ async function get(id) {
 }
 
 // Get all guests, optionally with filters like pagination
-async function list({ skip = 0, limit = 100 }) {
-  return await Guest.find().skip(skip).limit(limit).populate('roomId');
+async function list({ skip, limit }) {
+  return Guest.find()
+    .populate('roomId') // ✅ This makes guest.roomId contain full room object
+    .skip(skip)
+    .limit(limit);
 }
+
 
 // Update a guest's details
 async function update(id, guestData) {

@@ -92,4 +92,5 @@ button {
 }
 
 button:hover {
-  border
+  border-color: #646cff;
+}

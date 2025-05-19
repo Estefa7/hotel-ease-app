@@ -1,22 +1,22 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from './auth/AuthProvider';
 
 function Navbar() {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    logout(); // clears user and token from context + localStorage
     navigate('/login');
   };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light px-4">
       <div className="container-fluid">
-        {/* Brand name */}
+        {/* Brand */}
         <Link to="/" className="navbar-brand">HotelEase</Link>
 
-        {/* Toggle button for mobile */}
+        {/* Mobile toggle */}
         <button
           className="navbar-toggler"
           type="button"
@@ -26,7 +26,7 @@ function Navbar() {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Nav links + right-side button */}
+        {/* Navigation links */}
         <div className="collapse navbar-collapse justify-content-between" id="navbarContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
@@ -42,7 +42,7 @@ function Navbar() {
 
           {/* Right aligned login/logout */}
           <div className="d-flex">
-            {token ? (
+            {user ? (
               <button className="btn btn-outline-danger" onClick={handleLogout}>
                 Logout
               </button>

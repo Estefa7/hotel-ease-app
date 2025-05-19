@@ -16,23 +16,32 @@ function LoginPage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await api.post('/admins/auth/login', formData);
+  e.preventDefault();
+  try {
+    const res = await api.post('/admins/auth/login', formData);
+    const admin = res.data.admin;
 
-      // ✅ Store token and user in localStorage
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.admin));
+    const userToStore = {
+      id: admin._id,             // 👈 переименовываем _id в id
+      username: admin.username,
+      role: admin.role
+    };
 
-      // ✅ Update AuthContext
-      setUser(res.data.admin);
+    // ✅ Save to localStorage
+    localStorage.setItem('token', res.data.token);
+    localStorage.setItem('user', JSON.stringify(userToStore));
+    localStorage.setItem('adminId', admin._id);
 
-      // ✅ Redirect to homepage or dashboard
-      navigate('/');
-    } catch (err) {
-      setError('Invalid username or password');
-    }
-  };
+    // ✅ Update context
+    setUser(userToStore);
+
+    navigate('/');
+  } catch (err) {
+    setError('Invalid username or password');
+  }
+};
+
+
 
   return (
     <div className="container mt-5">
