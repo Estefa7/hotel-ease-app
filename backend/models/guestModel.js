@@ -8,8 +8,7 @@ const guestSchema = new mongoose.Schema(
     checkInDate:  { type: Date, required: true },
     checkOutDate: { type: Date, required: true },
     roomId:       { type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true },
-    createdBy:    { type: mongoose.Schema.Types.ObjectId, ref: 'Admin', required: true }
-  },
+   },
   { timestamps: true }
 );
 

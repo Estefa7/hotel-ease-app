@@ -7,8 +7,7 @@ const createGuestSchema = Joi.object({
   checkInDate: Joi.date().required(),
   checkOutDate: Joi.date().required(),
   roomId: Joi.string().required(),
-  createdBy: Joi.string().required(),
-});
+ }).options({ stripUnknown: true });
 
 const updateGuestSchema = Joi.object({
   firstName: Joi.string(),
@@ -17,8 +16,7 @@ const updateGuestSchema = Joi.object({
   checkInDate: Joi.date(),
   checkOutDate: Joi.date(),
   roomId: Joi.string(),
-  createdBy: Joi.string().required(),
-});
+ });
 
 const validateCreateGuest = (data) => createGuestSchema.validate(data);
 const validateUpdateGuest = (data) => updateGuestSchema.validate(data);

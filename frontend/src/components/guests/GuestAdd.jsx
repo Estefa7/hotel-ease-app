@@ -18,6 +18,7 @@ function GuestAdd({ onAdd }) {
 
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false); // 🛡️ Prevent duplicate submit
 
   useEffect(() => {
     if (!user) {
@@ -42,46 +43,53 @@ function GuestAdd({ onAdd }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-      console.log('🚨 Full user from context:', user); // 👈 ADD THIS
+  if (submitting) {
+    console.log("🚫 Submission already in progress, skipping...");
+    return;
+  }
 
-    const adminId = user?.id || user?._id;
-    if (!adminId) {
-      console.error('Admin ID not found in context. Please log in.');
-      return;
+  setSubmitting(true);
+  console.log("🚀 Submitting guest:", guest);
+
+  if (!user) {
+    console.error('User not found in context. Please log in.');
+    setSubmitting(false);
+    return;
+  }
+
+  try {
+    const res = await api.post('/guests', guest);
+    console.log('✅ Guest added successfully:', res.data);
+
+    if (onAdd) {
+      console.log('📣 Calling onAdd callback');
+      onAdd(res.data);
     }
 
-    try {
-      console.log('GuestAdd - user:', user);
-console.log('Submitting guest payload:', {
-  ...guest,
-  createdBy: adminId
-});
+    // Reset form
+    setGuest({
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      checkInDate: '',
+      checkOutDate: '',
+      roomId: ''
+    });
 
-      const res = await api.post('/guests', {
-        ...guest,
-        createdBy: adminId
-      });
-
-      onAdd(res.data);
-      setGuest({
-        firstName: '',
-        lastName: '',
-        phoneNumber: '',
-        checkInDate: '',
-        checkOutDate: '',
-        roomId: ''
-      });
-    } catch (err) {
-  if (err.response && err.response.data) {
-    console.error('Backend validation error:', err.response.data);
-  } else {
-    console.error('Error adding guest:', err);
+  } catch (err) {
+    if (err.response?.data?.error) {
+      console.error('❌ Backend validation error:', err.response.data);
+      alert(`Error: ${err.response.data.error}`);
+    } else {
+      console.error('❌ Error adding guest:', err);
+    }
+  } finally {
+    setSubmitting(false); // ✅ Reset submitting state after request
   }
-}
+};
 
-  };
 
   if (loading) return <p>Loading rooms, please wait...</p>;
 
@@ -129,7 +137,7 @@ console.log('Submitting guest payload:', {
           <option value="">-- Select Room --</option>
           {rooms.map(room => (
             <option key={room._id} value={room._id}>
-              {room.roomNumber || room.roomType || `Room ${room._id}`}
+              {room.roomNumber || `Room ${room._id}`}
             </option>
           ))}
         </select>
@@ -156,7 +164,9 @@ console.log('Submitting guest payload:', {
           required
         />
       </div>
-      <button type="submit" className="btn btn-primary">Add Guest</button>
+      <button type="submit" className="btn btn-primary" disabled={submitting}>
+        {submitting ? 'Adding...' : 'Add Guest'}
+      </button>
     </form>
   );
 }

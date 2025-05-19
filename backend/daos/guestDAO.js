@@ -2,9 +2,9 @@ const Guest = require('../models/GuestModel');
 
 // Create a new guest
 async function create(guestData) {
+  console.log("📝 Guest data being saved:", guestData); 
   const guest = new Guest(guestData);
-  await guest.save();
-  return guest;
+  return await guest.save();
 }
 
 // Get a guest by ID

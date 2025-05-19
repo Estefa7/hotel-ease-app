@@ -28,7 +28,6 @@ function GuestsPage() {
 
   const addGuest = async (guest) => {
     try {
-      await api.post('/guests', guest);
       fetchGuests();
       setAddVisible(false);
     } catch (err) {
