@@ -12,4 +12,4 @@ const guestSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Guest', guestSchema);
+module.exports = mongoose.models.Guest || mongoose.model('Guest', guestSchema);

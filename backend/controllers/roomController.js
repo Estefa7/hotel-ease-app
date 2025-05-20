@@ -71,3 +71,36 @@ exports.filterRooms = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
+const Guest = require('../models/guestModel');
+
+exports.getRoomAssignments = async (req, res) => {
+  try {
+    const roomId = req.params.id;
+    const today = new Date();
+
+    const guests = await Guest.find({ roomId });
+
+    const currentGuests = guests
+      .filter(guest =>
+        new Date(guest.checkInDate) <= today &&
+        new Date(guest.checkOutDate) >= today
+      )
+      .sort((a, b) => new Date(a.checkInDate) - new Date(b.checkInDate));
+
+    const futureGuests = guests
+      .filter(guest =>
+        new Date(guest.checkInDate) > today
+      )
+      .sort((a, b) => new Date(a.checkInDate) - new Date(b.checkInDate));
+
+
+    res.json({
+      currentGuests,
+      futureGuests
+    });
+  } catch (err) {
+    console.error('Error fetching room assignments:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};

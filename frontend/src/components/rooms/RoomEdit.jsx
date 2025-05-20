@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../api/axiosInstance';
 
 function RoomEdit({ room, onEdit }) {
   const [form, setForm] = useState(null);
@@ -31,20 +31,12 @@ function RoomEdit({ room, onEdit }) {
     ...allowedFields
   } = form;
 
-  try {
-    const response = await axios.put(
-      `http://localhost:5000/api/rooms/${_id}`,
-      {
+   try {
+      const response = await api.put(`/rooms/${_id}`, {
         ...allowedFields,
         pricePerNight: Number(allowedFields.pricePerNight),
         capacity: Number(allowedFields.capacity),
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      });
 
     onEdit(response.data);
   } catch (err) {
