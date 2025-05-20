@@ -21,8 +21,9 @@ const validateRoomCreation = (req, res, next) => {
   next();
 };
 const validateRoomUpdate = (req, res, next) => {
-  const { error } = validateUpdateRoom(req.body);
+  const { error, value } = validateUpdateRoom(req.body);
   if (error) return res.status(400).json({ message: error.details[0].message });
+  req.body = value; 
   next();
 };
 

@@ -17,18 +17,41 @@ function RoomEdit({ room, onEdit }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.put(`http://localhost:5000/api/rooms/${form._id}`, {
-        ...form,
-        pricePerNight: Number(form.pricePerNight),
-        capacity: Number(form.capacity)
-      });
-      onEdit(response.data);
-    } catch (err) {
-      console.error('Error updating room:', err);
-    }
-  };
+  e.preventDefault();
+
+  const token = localStorage.getItem('token');
+
+  // Destructure and remove unwanted fields
+  const {
+    _id,
+    createdAt,
+    updatedAt,
+    createdBy,
+    __v,
+    ...allowedFields
+  } = form;
+
+  try {
+    const response = await axios.put(
+      `http://localhost:5000/api/rooms/${_id}`,
+      {
+        ...allowedFields,
+        pricePerNight: Number(allowedFields.pricePerNight),
+        capacity: Number(allowedFields.capacity),
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    onEdit(response.data);
+  } catch (err) {
+    console.error('Error updating room:', err.response?.data || err.message);
+  }
+};
+
 
   if (!form) return null;
 

@@ -19,7 +19,11 @@ const updateRoomSchema = Joi.object({
   hasBalcony:    Joi.boolean(),
   availability:  Joi.boolean(),
   status:        Joi.string().valid('vacant','occupied','maintenance')
-});
+}).options({ stripUnknown: true });
+
+const validateUpdateRoom = (data) => {
+  return updateRoomSchema.validate(data); // ✅ returns { value, error }
+};
 
 module.exports = {
   validateCreateRoom: data => createRoomSchema.validate(data),
