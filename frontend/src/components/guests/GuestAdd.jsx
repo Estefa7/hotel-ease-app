@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../components/auth/AuthProvider';
 import api from '../../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
+import countryCodes from '../../constants/countryCodes';
 
 function GuestAdd({ onAdd }) {
   const { user } = useAuth();
@@ -19,6 +20,10 @@ function GuestAdd({ onAdd }) {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false); // 🛡️ Prevent duplicate submit
+
+
+const [countryCode, setCountryCode] = useState('+420');
+const [phoneError, setPhoneError] = useState('');
 
   useEffect(() => {
     if (!user) {
@@ -50,6 +55,18 @@ function GuestAdd({ onAdd }) {
     return;
   }
 
+  const selectedCountry = countryCodes.find(c => c.code === countryCode);
+  const isPhoneValid =
+    /^\d+$/.test(guest.phoneNumber) &&
+    guest.phoneNumber.length === selectedCountry.length;
+
+  if (!isPhoneValid) {
+    setPhoneError(`Please enter a valid ${selectedCountry.length}-digit number.`);
+    return;
+  }
+  // Reset error state
+  
+    setPhoneError('');
   setSubmitting(true);
   console.log("🚀 Submitting guest:", guest);
 
@@ -58,9 +75,11 @@ function GuestAdd({ onAdd }) {
     setSubmitting(false);
     return;
   }
+const fullPhoneNumber = `${countryCode}${guest.phoneNumber}`;
+  const guestData = { ...guest, phoneNumber: fullPhoneNumber };
 
   try {
-    const res = await api.post('/guests', guest);
+    const res = await api.post('/guests', guestData);
     console.log('✅ Guest added successfully:', res.data);
 
     if (onAdd) {
@@ -116,15 +135,34 @@ function GuestAdd({ onAdd }) {
         />
       </div>
       <div className="mb-3">
-        <label>Phone Number</label>
-        <input
-          name="phoneNumber"
-          className="form-control"
-          value={guest.phoneNumber}
-          onChange={handleChange}
-          required
-        />
-      </div>
+  <label>Phone Number</label>
+  <div style={{ display: 'flex', gap: '8px' }}>
+    <select
+      className="form-select"
+      value={countryCode}
+      onChange={(e) => setCountryCode(e.target.value)}
+      style={{ width: '150px' }}
+    >
+      {countryCodes.map((c) => (
+        <option key={c.code} value={c.code}>
+          {c.country} ({c.code})
+        </option>
+      ))}
+    </select>
+    <input
+      type="text"
+      className="form-control"
+      value={guest.phoneNumber}
+      onChange={(e) =>
+        setGuest((prev) => ({ ...prev, phoneNumber: e.target.value }))
+      }
+      placeholder="Enter phone number"
+      required
+    />
+  </div>
+  {phoneError && <small className="text-danger">{phoneError}</small>}
+</div>
+
       <div className="mb-3">
         <label>Assign Room</label>
         <select
