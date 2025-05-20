@@ -43,16 +43,16 @@ const validateGuestCreation = (req, res, next) => {
 };
 
 const validateGuestUpdate = (req, res, next) => {
-  console.log('🛠 validateGuestUpdate triggered with:', req.body); // Log start
-  const { error } = validateUpdateGuest(req.body);
+  const { error, value } = validateUpdateGuest(req.body);
 
   if (error) {
-    console.error('❌ Guest update validation failed:', error.details[0].message); // Log reason
     return res.status(400).json({ message: error.details[0].message });
   }
 
-  next(); // All good
+  req.body = value; // ✅ Use the validated + stripped version
+  next();
 };
+
 
 
 // Admin validation

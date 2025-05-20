@@ -16,7 +16,7 @@ const updateGuestSchema = Joi.object({
   checkInDate: Joi.date(),
   checkOutDate: Joi.date(),
   roomId: Joi.string(),
- });
+ }).options({ stripUnknown: true });;
 
 const validateCreateGuest = (data) => createGuestSchema.validate(data);
 const validateUpdateGuest = (data) => updateGuestSchema.validate(data);
