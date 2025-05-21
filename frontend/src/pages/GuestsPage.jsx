@@ -11,6 +11,15 @@ function GuestsPage() {
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [isAddPopupVisible, setAddVisible] = useState(false);
   const [isEditPopupVisible, setEditVisible] = useState(false);
+const [filters, setFilters] = useState({
+  staying: true,
+  upcoming: false,
+  checkedOut: false,
+});
+
+const toggleFilter = (key) => {
+  setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
+};
 
   // Fetch guests from backend
   useEffect(() => {
@@ -54,6 +63,23 @@ function GuestsPage() {
     }
   };
 
+  // Filter logic
+  const now = new Date();
+  const filteredGuests = guests.filter((guest) => {
+    const checkIn = new Date(guest.checkInDate);
+    const checkOut = new Date(guest.checkOutDate);
+
+    return (
+      (filters.staying && checkIn <= now && checkOut >= now) ||
+      (filters.upcoming && checkIn > now) ||
+      (filters.checkedOut && checkOut < now)
+    );
+  });
+
+  const sortedGuests = [...filteredGuests].sort((a, b) => {
+  return new Date(a.checkInDate) - new Date(b.checkInDate); // ascending
+});
+
   return (
     <Layout>
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -61,8 +87,31 @@ function GuestsPage() {
         <Button variant="success" onClick={() => setAddVisible(true)}>Add Guest</Button>
       </div>
 
+{/* 🔘 Filter Buttons */}
+      <div className="d-flex gap-2 mb-3">
+        <Button
+          variant={filters.staying ? 'success' : 'outline-secondary'}
+          onClick={() => toggleFilter('staying')}
+        >
+          Staying
+        </Button>
+        <Button
+          variant={filters.upcoming ? 'success' : 'outline-secondary'}
+          onClick={() => toggleFilter('upcoming')}
+        >
+          Upcoming
+        </Button>
+        <Button
+          variant={filters.checkedOut ? 'success' : 'outline-secondary'}
+          onClick={() => toggleFilter('checkedOut')}
+        >
+          Checked Out
+        </Button>
+      </div>
+
+      
       <GuestList
-        guests={guests}
+        guests={sortedGuests}
         onEdit={(guest) => {
           setSelectedGuest(guest);
           setEditVisible(true);

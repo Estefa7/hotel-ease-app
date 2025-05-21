@@ -24,6 +24,7 @@ function GuestAdd({ onAdd }) {
 
 const [countryCode, setCountryCode] = useState('+420');
 const [phoneError, setPhoneError] = useState('');
+const [dateError, setDateError] = useState('');
 
   useEffect(() => {
     if (!user) {
@@ -45,6 +46,13 @@ const [phoneError, setPhoneError] = useState('');
   const handleChange = (e) => {
     const { name, value } = e.target;
     setGuest(prev => ({ ...prev, [name]: value }));
+    if (name === 'checkInDate' || name === 'checkOutDate') {
+  setDateError('');
+  if (name === 'phoneNumber') {
+    setPhoneError('');
+  }
+}
+
   };
 
   const handleSubmit = async (e) => {
@@ -67,6 +75,33 @@ const [phoneError, setPhoneError] = useState('');
   // Reset error state
   
     setPhoneError('');
+
+    const now = new Date();
+  const checkIn = new Date(guest.checkInDate);
+  const checkOut = new Date(guest.checkOutDate);
+
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(now.getFullYear() - 1);
+
+  const oneYearFromNow = new Date();
+  oneYearFromNow.setFullYear(now.getFullYear() + 1);
+
+  if (checkOut <= checkIn) {
+    setDateError("Check-out date must be after check-in date.");
+    return;
+  }
+
+  if (checkIn < oneYearAgo || checkIn > oneYearFromNow) {
+    setDateError("Check-in date must be within one year from today.");
+    return;
+  }
+
+  if (checkOut < oneYearAgo || checkOut > oneYearFromNow) {
+    setDateError("Check-out date must be within one year from today.");
+    return;
+  }
+
+  setDateError('');
   setSubmitting(true);
   console.log("🚀 Submitting guest:", guest);
 
@@ -77,6 +112,8 @@ const [phoneError, setPhoneError] = useState('');
   }
 const fullPhoneNumber = `${countryCode}${guest.phoneNumber}`;
   const guestData = { ...guest, phoneNumber: fullPhoneNumber };
+
+
 
   try {
     const res = await api.post('/guests', guestData);
@@ -201,6 +238,7 @@ const fullPhoneNumber = `${countryCode}${guest.phoneNumber}`;
           onChange={handleChange}
           required
         />
+          {dateError && <small className="text-danger">{dateError}</small>}
       </div>
       <button type="submit" className="btn btn-primary" disabled={submitting}>
         {submitting ? 'Adding...' : 'Add Guest'}
