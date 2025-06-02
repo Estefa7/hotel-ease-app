@@ -29,9 +29,12 @@ function RoomAdd({ onAdd }) {
         capacity: Number(room.capacity),
       });
 
-      onAdd(response.data);
+      // ✅ Safely trigger the success callback
+      if (onAdd && typeof onAdd === 'function') {
+        onAdd(response.data);
+      }
 
-      // Reset form
+      // ✅ Reset the form
       setRoom({
         roomNumber: '',
         roomType: '',

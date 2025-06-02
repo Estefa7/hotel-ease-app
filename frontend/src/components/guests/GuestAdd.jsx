@@ -7,6 +7,7 @@ import countryCodes from '../../constants/countryCodes';
 function GuestAdd({ onAdd }) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [successMessage, setSuccessMessage] = useState('');
 
   const [guest, setGuest] = useState({
     firstName: '',
@@ -48,9 +49,10 @@ const [dateError, setDateError] = useState('');
     setGuest(prev => ({ ...prev, [name]: value }));
     if (name === 'checkInDate' || name === 'checkOutDate') {
   setDateError('');
-  if (name === 'phoneNumber') {
-    setPhoneError('');
-  }
+}
+
+if (name === 'phoneNumber') {
+  setPhoneError('');
 }
 
   };
@@ -133,6 +135,8 @@ const fullPhoneNumber = `${countryCode}${guest.phoneNumber}`;
       checkOutDate: '',
       roomId: ''
     });
+setSuccessMessage('✅ Guest added successfully!');
+      setTimeout(() => setSuccessMessage(''), 3000);
 
   } catch (err) {
     if (err.response?.data?.error) {
@@ -240,6 +244,7 @@ const fullPhoneNumber = `${countryCode}${guest.phoneNumber}`;
         />
           {dateError && <small className="text-danger">{dateError}</small>}
       </div>
+      {successMessage && <div className="alert alert-success">{successMessage}</div>}
       <button type="submit" className="btn btn-primary" disabled={submitting}>
         {submitting ? 'Adding...' : 'Add Guest'}
       </button>

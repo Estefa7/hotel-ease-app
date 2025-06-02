@@ -11,7 +11,7 @@ function RoomsPage() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isAddPopupVisible, setAddVisible] = useState(false);
   const [isEditPopupVisible, setEditVisible] = useState(false);
-
+  const [successMessage, setSuccessMessage] = useState('');
   const [filters, setFilters] = useState({
   roomType: '',
   status: '',
@@ -22,11 +22,13 @@ function RoomsPage() {
   maxPrice: '',
 });
 
-
+  // Fetch rooms when filters change
   useEffect(() => {
     fetchRooms();
   }, [filters]);
 
+  
+  // Fetch room data from the backend with filters
   const fetchRooms = async () => {
     try {
       const res = await api.get('/rooms', { params: filters });
@@ -36,21 +38,31 @@ function RoomsPage() {
     }
   };
 
+   // Handle input changes in filter form
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const addRoom = () => {
-    fetchRooms();
+   // Add a new room
+  const addRoom = async (room) => {
+  try {
+    await fetchRooms();
     setAddVisible(false);
-  };
+    setSuccessMessage('✅ Room added successfully!');
+    setTimeout(() => setSuccessMessage(''), 3000);
+  } catch (err) {
+    console.error('Error adding room:', err);
+  }
+};
 
+  // Edit an existing room
   const editRoom = () => {
     fetchRooms();
     setEditVisible(false);
-  };
+    };
 
+  // Delete a room by ID
   const deleteRoom = async (id) => {
     try {
       await api.delete(`/rooms/${id}`);
@@ -62,11 +74,28 @@ function RoomsPage() {
 
   return (
     <Layout>
+      {/* ✅ Success Message Overlay*/}
+      {successMessage && (
+        <div
+          className="alert alert-success"
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 9999,
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
+
+      {/* 🔘 Page Header */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2>Rooms</h2>
         <Button variant="success" onClick={() => setAddVisible(true)}>Add Room</Button>
       </div>
 
+      {/* Search & Price Filter */}
 <Form className="mb-3">
   <Row>
     <Col md={4}>

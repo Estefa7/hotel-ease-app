@@ -11,15 +11,13 @@ function GuestsPage() {
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [isAddPopupVisible, setAddVisible] = useState(false);
   const [isEditPopupVisible, setEditVisible] = useState(false);
-const [filters, setFilters] = useState({
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [filters, setFilters] = useState({
   staying: true,
   upcoming: false,
   checkedOut: false,
 });
-
-const toggleFilter = (key) => {
-  setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
-};
 
   // Fetch guests from backend
   useEffect(() => {
@@ -37,8 +35,10 @@ const toggleFilter = (key) => {
 
   const addGuest = async (guest) => {
     try {
-      fetchGuests();
-      setAddVisible(false);
+      await fetchGuests();
+      setAddVisible(false); // Close the modal
+      setSuccessMessage('✅ Guest added successfully');
+      setTimeout(() => setSuccessMessage(''), 3000); // Hide message after 3s
     } catch (err) {
       console.error('Error adding guest:', err);
     }
@@ -63,6 +63,9 @@ const toggleFilter = (key) => {
     }
   };
 
+  const toggleFilter = (key) => {
+  setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
+};
   // Filter logic
   const now = new Date();
   const filteredGuests = guests.filter((guest) => {
@@ -82,12 +85,30 @@ const toggleFilter = (key) => {
 
   return (
     <Layout>
+       {/* ✅ Success Message Overlay */}
+      {successMessage && (
+        <div
+          className="alert alert-success"
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 9999,
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
+
+      {/* 🔘 Page Header */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2>Guests</h2>
-        <Button variant="success" onClick={() => setAddVisible(true)}>Add Guest</Button>
+        <Button variant="success" onClick={() => setAddVisible(true)}>
+          Add Guest
+        </Button>
       </div>
 
-{/* 🔘 Filter Buttons */}
+      {/* 🔘 Filter Buttons */}
       <div className="d-flex gap-2 mb-3">
         <Button
           variant={filters.staying ? 'success' : 'outline-secondary'}
